@@ -1,0 +1,295 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: EXAMPLE
+    folder: system
+    interval: 1m
+    rules:
+      - uid: bedqzfu4wk0lcd-EXAMPLE
+        title: CPU-Busy-alert-EXAMPLE
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 86400
+              to: 0
+            datasourceUid: PF8BD7873D9DE252A
+            model:
+              datasource:
+                type: prometheus
+                uid: PF8BD7873D9DE252A
+              editorMode: code
+              exemplar: false
+              expr: 100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle", instance="nodeexporter:9100"}[$__rate_interval])))
+              instant: true
+              interval: ""
+              intervalFactor: 1
+              intervalMs: 15000
+              legendFormat: ""
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              step: 240
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 1
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        dashboardUid: rYdddlPWk
+        panelId: 20
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          __dashboardUid__: rYdddlPWk
+          __panelId__: "20"
+          description: test-description
+          summary: test-summary
+        labels: {}
+        isPaused: false
+        notification_settings:
+          receiver: EXAMPLE
+      - uid: cedqzlze59ukga-EXAMPLE
+        title: RAM-Used-alert-EXAMPLE
+        condition: D
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 86400
+              to: 0
+            datasourceUid: PF8BD7873D9DE252A
+            model:
+              datasource:
+                type: prometheus
+                uid: PF8BD7873D9DE252A
+              editorMode: code
+              exemplar: false
+              expr: ((node_memory_MemTotal_bytes{instance="nodeexporter:9100", job="nodeexporter"} - node_memory_MemFree_bytes{instance="nodeexporter:9100", job="nodeexporter"}) / node_memory_MemTotal_bytes{instance="nodeexporter:9100", job="nodeexporter"}) * 100
+              format: time_series
+              instant: true
+              interval: ""
+              intervalFactor: 1
+              intervalMs: 15000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              step: 240
+          - refId: B
+            relativeTimeRange:
+              from: 86400
+              to: 0
+            datasourceUid: PF8BD7873D9DE252A
+            model:
+              datasource:
+                type: prometheus
+                uid: PF8BD7873D9DE252A
+              editorMode: code
+              exemplar: false
+              expr: (1 - (node_memory_MemAvailable_bytes{instance="nodeexporter:9100", job="nodeexporter"} / node_memory_MemTotal_bytes{instance="nodeexporter:9100", job="nodeexporter"})) * 100
+              format: time_series
+              instant: true
+              interval: ""
+              intervalFactor: 1
+              intervalMs: 15000
+              maxDataPoints: 43200
+              range: false
+              refId: B
+              step: 240
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: C
+              type: reduce
+          - refId: D
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 90
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - D
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: D
+              type: threshold
+        dashboardUid: rYdddlPWk
+        panelId: 16
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          __dashboardUid__: rYdddlPWk
+          __panelId__: "16"
+          description: test-description
+          summary: test-summary
+        labels: {}
+        isPaused: false
+        notification_settings:
+          receiver: EXAMPLE
+      - uid: aedqzpk29zabkb-EXAMPLE
+        title: Root-FS-Used-alert-EXAMPLE
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 86400
+              to: 0
+            datasourceUid: PF8BD7873D9DE252A
+            model:
+              datasource:
+                type: prometheus
+                uid: PF8BD7873D9DE252A
+              editorMode: code
+              exemplar: false
+              expr: 100 - ((node_filesystem_avail_bytes{instance="nodeexporter:9100",job="nodeexporter",mountpoint="/",fstype!="rootfs"} * 100) / node_filesystem_size_bytes{instance="nodeexporter:9100",job="nodeexporter",mountpoint="/",fstype!="rootfs"})
+              format: time_series
+              instant: true
+              interval: ""
+              intervalFactor: 1
+              intervalMs: 15000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              step: 240
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 90
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        dashboardUid: rYdddlPWk
+        panelId: 154
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          __dashboardUid__: rYdddlPWk
+          __panelId__: "154"
+          description: test-description
+          summary: test-summary
+        labels: {}
+        isPaused: false
+        notification_settings:
+          receiver: EXAMPLE

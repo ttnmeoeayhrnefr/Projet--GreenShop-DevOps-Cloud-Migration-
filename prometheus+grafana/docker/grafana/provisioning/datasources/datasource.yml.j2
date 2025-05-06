@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+{% for server in groups["prometheus_targets"] %}
+  - name: "{{ server }}"
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: "http://{{ hostvars[server].ansible_host }}:9090"
+    basicAuth: true
+    basicAuthUser: admin
+    secureJsonData:
+      basicAuthPassword: admin
+    isDefault: false
+    editable: false
+
+{% endfor %}

@@ -1,0 +1,91 @@
+---
+- hosts: EXAMPLE
+  become: true
+  vars:
+    monitoring_path: /srv/grafana
+  vars_files:
+    - ./group_vars/grafana/vault.yml
+
+  roles:
+    - role: geerlingguy.docker
+      vars:
+        docker_install_compose_plugin: true
+
+  tasks:
+    - name: Ensure base directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        recurse: true
+      loop:
+        - "{{ monitoring_path }}"
+        - "{{ monitoring_path }}/grafana/provisioning/dashboards/"
+        - "{{ monitoring_path }}/grafana/provisioning/dashboards/system/"
+        - "{{ monitoring_path }}/grafana/provisioning/datasources/"
+        - "{{ monitoring_path }}/grafana/provisioning/alerting/"
+        - "{{ monitoring_path }}/caddy/"
+
+    - name: Deploy Grafana monitoring stack
+      ansible.builtin.copy:
+        src: "./docker/docker-compose-grafana.yml"
+        dest: "{{ monitoring_path }}/docker-compose-grafana.yml"
+
+    - name: Copy Grafana configuration file
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { src: "./docker/grafana/provisioning/grafana.ini.j2", dest: "{{ monitoring_path }}/grafana/provisioning/grafana.ini" }
+
+    - name: Copy Grafana datasource file
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { src: "./docker/grafana/provisioning/datasources/datasource.yml.j2", dest: "{{ monitoring_path }}/grafana/provisioning/datasources/datasource.yml" }
+
+    - name: Copy Grafana dashboard files
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { src: "./docker/grafana/provisioning/dashboards/dashboard.yml", dest: "{{ monitoring_path }}/grafana/provisioning/dashboards/dashboard.yml" }
+        - { src: "./docker/grafana/provisioning/dashboards/system/node_exporter_full.json", dest: "{{ monitoring_path }}/grafana/provisioning/dashboards/system/node_exporter_full.json" }
+
+    - name: Copy Grafana alerting files
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { src: "./docker/grafana/provisioning/alerting/contact_points.yml", dest: "{{ monitoring_path }}/grafana/provisioning/alerting/contact_points.yml" }
+        - { src: "./docker/grafana/provisioning/alerting/rules.yml", dest: "{{ monitoring_path }}/grafana/provisioning/alerting/rules.yml" }
+
+    - name: Copy Caddyfile
+      ansible.builtin.copy:
+        src: "./docker/caddy/grafana/Caddyfile"
+        dest: "{{ monitoring_path }}/caddy/Caddyfile"
+
+    - name: Ensure /etc/iptables directory exists
+      ansible.builtin.file:
+        path: /etc/iptables
+        state: directory
+
+    - name: Flush existing iptables rules
+      ansible.builtin.iptables:
+        flush: yes
+        table: filter
+
+    - name: Execute iptables save and capture output
+      ansible.builtin.shell: iptables-save
+      register: iptables_output
+
+    - name: Save iptables rules
+      ansible.builtin.copy:
+        content: "{{ iptables_output.stdout }}"
+        dest: /etc/iptables/rules.v4
+
+    - name: Create and start services
+      community.docker.docker_compose_v2:
+        project_src: "{{ monitoring_path }}"
+        files:
+          - docker-compose-grafana.yml
