@@ -1,0 +1,18 @@
+version: 'EXAMPLE'
+services:
+  EXAMPLE:
+    container_name: EXAMPLE
+    image: EXAMPLE
+    restart: always
+    command: EXAMPLE
+    volumes:
+      - EXAMPLE:/EXAMPLE
+    depends_on:
+      - EXAMPLE
+    ports:
+        - EXAMPLE:EXAMPLE
+    env_file: .EXAMPLE
+
+volumes:
+  EXAMPLE:
+    name: EXAMPLE
