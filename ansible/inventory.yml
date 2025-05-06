@@ -1,0 +1,7 @@
+all:
+  children:
+    EXAMPLE:
+      hosts:
+        EXAMPLE:
+          ansible_host: EXAMPLE
+          ansible_user: EXAMPLE
