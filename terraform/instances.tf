@@ -1,4 +1,4 @@
-resource "aws_instance" "GreenShop-INSTANCE-ADM" {
+resource "aws_instance" "GreenShop-INSTANCE-BASTION" {
   key_name                 = "infra"
   ami                      = "ami-084568db4383264d4"
   security_groups          = [aws_security_group.GreenShop-SG-ADM.id]
@@ -120,5 +120,45 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
 
   tags = {
     Name = "GreenShop-INSTANCE-WEB3"
+  }
+}
+
+resource "aws_instance" "GreenShop-INSTANCE-DB1" {
+  key_name                 = "infra"
+  ami                      = "ami-084568db4383264d4"
+  security_groups          = [aws_security_group.GreenShop-SG-WEB.id]
+  subnet_id                = aws_subnet.GreenShop-priv4.id
+  instance_type            = "t2.micro"
+  private_ip = "10.0.5.20"
+
+  tags = {
+    Name = "GreenShop-INSTANCE-DB1"
+  }
+}
+
+resource "aws_instance" "GreenShop-INSTANCE-DB2" {
+  key_name                 = "infra"
+  ami                      = "ami-084568db4383264d4"
+  security_groups          = [aws_security_group.GreenShop-SG-WEB.id]
+  subnet_id                = aws_subnet.GreenShop-priv4.id
+  instance_type            = "t2.micro"
+  private_ip = "10.0.5.21"
+
+  tags = {
+    Name = "GreenShop-INSTANCE-DB2"
+  }
+}
+
+resource "aws_instance" "GreenShop-INSTANCE-JENKINS" {
+  key_name                 = "infra"
+  ami                      = "ami-084568db4383264d4"
+  security_groups          = [aws_security_group.GreenShop-SG-ADM.id]
+  subnet_id                = aws_subnet.GreenShop-pub.id
+  instance_type            = "t2.micro"
+  associate_public_ip_address = true
+  private_ip = "10.0.1.12"
+
+  tags = {
+    Name = "GreenShop-INSTANCE-JENKINS"
   }
 }

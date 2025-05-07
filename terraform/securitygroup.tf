@@ -79,3 +79,33 @@ resource "aws_security_group" "GreenShop-SG-WEB" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "GreenShop-SG-DB" {
+  name        = "GreenShop-SG-DB"
+  description = "GreenShop-SG-DB"
+  vpc_id      = aws_vpc.GreenShop-vpc.id
+
+  ingress {
+    description = "Allow SSH from Admin"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    security_groups = [aws_security_group.GreenShop-SG-ADM.id]
+  }
+
+  ingress {
+    description = "Allow mysql from web"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = [aws_security_group.GreenShop-SG-WEB.id]
+  }
+
+  egress {
+    description = "Allow out Traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
