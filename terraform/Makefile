@@ -15,3 +15,6 @@ install-aws:
 	aws --version
 	rm -rf /tmp/awscliv2.zip
 	rm -rf /tmp/aws/
+
+configure-aws:
+	aws configure
