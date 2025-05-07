@@ -1,7 +1,7 @@
-resource "aws_internet_gateway" "Ben-igw" {
-  vpc_id = aws_vpc.Ben-vpc.id
+resource "aws_internet_gateway" "GreenShop-igw" {
+  vpc_id = aws_vpc.GreenShop-vpc.id
 
   tags = {
-    Name = "Ben-igw"
+    Name = "GreenShop-igw"
   }
 }
