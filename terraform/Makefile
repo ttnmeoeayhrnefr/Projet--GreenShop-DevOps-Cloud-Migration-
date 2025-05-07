@@ -6,3 +6,11 @@ install-terraform:
 	sudo apt update
 	sudo apt-get install terraform
 	terraform -v
+
+install-aws:
+	sudo apt-get update && sudo apt-get install -y curl unzip
+	curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+	unzip /tmp/awscliv2.zip
+	sudo /tmp/aws/install
+	rm -rf /tmp/aws/
+	aws --version
