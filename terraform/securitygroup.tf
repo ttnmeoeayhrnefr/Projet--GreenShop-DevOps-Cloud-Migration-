@@ -1,7 +1,7 @@
-resource "aws_security_group" "Ben-SG-ADM" {
-  name        = "Ben-SG-ADM"
-  description = "Ben-SG-ADM"
-  vpc_id      = aws_vpc.Ben-vpc.id
+resource "aws_security_group" "GreenShop-SG-ADM" {
+  name        = "GreenShop-SG-ADM"
+  description = "GreenShop-SG-ADM"
+  vpc_id      = aws_vpc.GreenShop-vpc.id
 
   ingress {
     description = "Allow SSH from External"
@@ -20,17 +20,17 @@ resource "aws_security_group" "Ben-SG-ADM" {
   }
 }
 
-resource "aws_security_group" "Ben-SG-RPROXY" {
-  name        = "Ben-SG-RPROXY"
-  description = "Ben-SG-RPROXY"
-  vpc_id      = aws_vpc.Ben-vpc.id
+resource "aws_security_group" "GreenShop-SG-RPROXY" {
+  name        = "GreenShop-SG-RPROXY"
+  description = "GreenShop-SG-RPROXY"
+  vpc_id      = aws_vpc.GreenShop-vpc.id
 
   ingress {
     description = "Allow SSH from Admin"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    security_groups = [aws_security_group.Ben-SG-ADM.id]
+    security_groups = [aws_security_group.GreenShop-SG-ADM.id]
   }
 
   ingress {
@@ -50,17 +50,17 @@ resource "aws_security_group" "Ben-SG-RPROXY" {
   }
 }
 
-resource "aws_security_group" "Ben-SG-WEB" {
-  name        = "Ben-SG-WEB"
-  description = "Ben-SG-WEB"
-  vpc_id      = aws_vpc.Ben-vpc.id
+resource "aws_security_group" "GreenShop-SG-WEB" {
+  name        = "GreenShop-SG-WEB"
+  description = "GreenShop-SG-WEB"
+  vpc_id      = aws_vpc.GreenShop-vpc.id
 
   ingress {
     description = "Allow SSH from Admin"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    security_groups = [aws_security_group.Ben-SG-ADM.id]
+    security_groups = [aws_security_group.GreenShop-SG-ADM.id]
   }
 
   ingress {
@@ -68,7 +68,7 @@ resource "aws_security_group" "Ben-SG-WEB" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    security_groups = [aws_security_group.Ben-SG-RPROXY.id]
+    security_groups = [aws_security_group.GreenShop-SG-RPROXY.id]
   }
 
   egress {
