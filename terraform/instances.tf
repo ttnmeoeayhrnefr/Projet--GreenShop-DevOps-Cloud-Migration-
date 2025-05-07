@@ -1,10 +1,11 @@
 resource "aws_instance" "GreenShop-INSTANCE-ADM" {
-  key_name                 = "admin"
+  key_name                 = "infra"
   ami                      = "ami-084568db4383264d4"
   security_groups          = [aws_security_group.GreenShop-SG-ADM.id]
   subnet_id                = aws_subnet.GreenShop-pub.id
   instance_type            = "t2.micro"
   associate_public_ip_address = true
+  private_ip = "10.0.1.10"
 
   tags = {
     Name = "GreenShop-INSTANCE-ADM"
@@ -12,12 +13,13 @@ resource "aws_instance" "GreenShop-INSTANCE-ADM" {
 }
 
 resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
-  key_name                 = "admin"
+  key_name                 = "infra"
   ami                      = "ami-084568db4383264d4"
   security_groups          = [aws_security_group.GreenShop-SG-RPROXY.id]
   subnet_id                = aws_subnet.GreenShop-pub.id
   instance_type            = "t2.micro"
   associate_public_ip_address = true
+  private_ip ="10.0.1.11"
 
   user_data = <<-EOF
               #!/bin/bash
@@ -56,11 +58,12 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
 
 
 resource "aws_instance" "GreenShop-INSTANCE-WEB1" {
-  key_name        = "admin"
+  key_name        = "infra"
   ami             = "ami-084568db4383264d4"
   security_groups = [aws_security_group.GreenShop-SG-WEB.id]
   subnet_id       = aws_subnet.GreenShop-priv1.id
   instance_type   = "t2.micro"
+  private_ip ="10.0.2.5"
 
   user_data = <<-EOF
               #!/bin/bash
@@ -77,11 +80,12 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB1" {
 }
 
 resource "aws_instance" "GreenShop-INSTANCE-WEB2" {
-  key_name        = "admin"
+  key_name        = "infra"
   ami             = "ami-084568db4383264d4"
   security_groups = [aws_security_group.GreenShop-SG-WEB.id]
   subnet_id       = aws_subnet.GreenShop-priv2.id
   instance_type   = "t2.micro"
+  private_ip ="10.0.3.5"
 
   user_data = <<-EOF
               #!/bin/bash
@@ -98,11 +102,12 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB2" {
 }
 
 resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
-  key_name        = "admin"
+  key_name        = "infra"
   ami             = "ami-084568db4383264d4"
   security_groups = [aws_security_group.GreenShop-SG-WEB.id]
   subnet_id       = aws_subnet.GreenShop-priv3.id
   instance_type   = "t2.micro"
+  private_ip ="10.0.4.5"
 
   user_data = <<-EOF
               #!/bin/bash
