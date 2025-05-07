@@ -25,4 +25,7 @@ make install-aws
 
 # Configure AWS CLI with your Learner Lab credentials
 make configure-aws
+
+# Set your AWS session token (required for Learner Lab)
+aws configure set aws_session_token <your-session-token>
 ```
