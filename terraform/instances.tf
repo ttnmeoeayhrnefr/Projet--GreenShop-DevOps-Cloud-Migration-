@@ -1,21 +1,21 @@
-resource "aws_instance" "Ben-INSTANCE-ADM" {
+resource "aws_instance" "GreenShop-INSTANCE-ADM" {
   key_name                 = "admin"
   ami                      = "ami-084568db4383264d4"
-  security_groups          = [aws_security_group.Ben-SG-ADM.id]
-  subnet_id                = aws_subnet.Ben-pub.id
+  security_groups          = [aws_security_group.GreenShop-SG-ADM.id]
+  subnet_id                = aws_subnet.GreenShop-pub.id
   instance_type            = "t2.micro"
   associate_public_ip_address = true
 
   tags = {
-    Name = "Ben-INSTANCE-ADM"
+    Name = "GreenShop-INSTANCE-ADM"
   }
 }
 
-resource "aws_instance" "Ben-INSTANCE-RPROXY" {
+resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
   key_name                 = "admin"
   ami                      = "ami-084568db4383264d4"
-  security_groups          = [aws_security_group.Ben-SG-RPROXY.id]
-  subnet_id                = aws_subnet.Ben-pub.id
+  security_groups          = [aws_security_group.GreenShop-SG-RPROXY.id]
+  subnet_id                = aws_subnet.GreenShop-pub.id
   instance_type            = "t2.micro"
   associate_public_ip_address = true
 
@@ -28,9 +28,9 @@ resource "aws_instance" "Ben-INSTANCE-RPROXY" {
               
               cat > /etc/nginx/conf.d/load-balancer.conf <<EOL
               upstream backend {
-                  server ${aws_instance.Ben-INSTANCE-WEB1.private_ip};
-                  server ${aws_instance.Ben-INSTANCE-WEB2.private_ip};
-                  server ${aws_instance.Ben-INSTANCE-WEB3.private_ip};
+                  server ${aws_instance.GreenShop-INSTANCE-WEB1.private_ip};
+                  server ${aws_instance.GreenShop-INSTANCE-WEB2.private_ip};
+                  server ${aws_instance.GreenShop-INSTANCE-WEB3.private_ip};
               }
 
               server {
@@ -50,16 +50,16 @@ resource "aws_instance" "Ben-INSTANCE-RPROXY" {
               EOF
 
   tags = {
-    Name = "Ben-INSTANCE-RPROXY"
+    Name = "GreenShop-INSTANCE-RPROXY"
   }
 }
 
 
-resource "aws_instance" "Ben-INSTANCE-WEB1" {
+resource "aws_instance" "GreenShop-INSTANCE-WEB1" {
   key_name        = "admin"
   ami             = "ami-084568db4383264d4"
-  security_groups = [aws_security_group.Ben-SG-WEB.id]
-  subnet_id       = aws_subnet.Ben-priv1.id
+  security_groups = [aws_security_group.GreenShop-SG-WEB.id]
+  subnet_id       = aws_subnet.GreenShop-priv1.id
   instance_type   = "t2.micro"
 
   user_data = <<-EOF
@@ -72,15 +72,15 @@ resource "aws_instance" "Ben-INSTANCE-WEB1" {
               EOF
 
   tags = {
-    Name = "Ben-INSTANCE-WEB1"
+    Name = "GreenShop-INSTANCE-WEB1"
   }
 }
 
-resource "aws_instance" "Ben-INSTANCE-WEB2" {
+resource "aws_instance" "GreenShop-INSTANCE-WEB2" {
   key_name        = "admin"
   ami             = "ami-084568db4383264d4"
-  security_groups = [aws_security_group.Ben-SG-WEB.id]
-  subnet_id       = aws_subnet.Ben-priv2.id
+  security_groups = [aws_security_group.GreenShop-SG-WEB.id]
+  subnet_id       = aws_subnet.GreenShop-priv2.id
   instance_type   = "t2.micro"
 
   user_data = <<-EOF
@@ -93,15 +93,15 @@ resource "aws_instance" "Ben-INSTANCE-WEB2" {
               EOF
 
   tags = {
-    Name = "Ben-INSTANCE-WEB2"
+    Name = "GreenShop-INSTANCE-WEB2"
   }
 }
 
-resource "aws_instance" "Ben-INSTANCE-WEB3" {
+resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
   key_name        = "admin"
   ami             = "ami-084568db4383264d4"
-  security_groups = [aws_security_group.Ben-SG-WEB.id]
-  subnet_id       = aws_subnet.Ben-priv3.id
+  security_groups = [aws_security_group.GreenShop-SG-WEB.id]
+  subnet_id       = aws_subnet.GreenShop-priv3.id
   instance_type   = "t2.micro"
 
   user_data = <<-EOF
@@ -114,6 +114,6 @@ resource "aws_instance" "Ben-INSTANCE-WEB3" {
               EOF
 
   tags = {
-    Name = "Ben-INSTANCE-WEB3"
+    Name = "GreenShop-INSTANCE-WEB3"
   }
 }
