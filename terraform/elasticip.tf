@@ -1,1 +1,1 @@
-resource "aws_eip" "Ben-nateip" {}
+resource "aws_eip" "GreenShop-nateip" {}
