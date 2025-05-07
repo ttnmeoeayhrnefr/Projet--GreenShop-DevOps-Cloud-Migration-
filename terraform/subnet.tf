@@ -1,35 +1,35 @@
-resource "aws_subnet" "Ben-pub" {
-  vpc_id     = aws_vpc.Ben-vpc.id
+resource "aws_subnet" "GreenShop-pub" {
+  vpc_id     = aws_vpc.GreenShop-vpc.id
   cidr_block = "10.0.1.0/24"
 
   tags = {
-    Name = "Ben-pub"
+    Name = "GreenShop-pub"
   }
 }
 
-resource "aws_subnet" "Ben-priv1" {
-  vpc_id     = aws_vpc.Ben-vpc.id
+resource "aws_subnet" "GreenShop-priv1" {
+  vpc_id     = aws_vpc.GreenShop-vpc.id
   cidr_block = "10.0.2.0/24"
 
   tags = {
-    Name = "Ben-priv1"
+    Name = "GreenShop-priv1"
   }
 }
 
-resource "aws_subnet" "Ben-priv2" {
-  vpc_id     = aws_vpc.Ben-vpc.id
+resource "aws_subnet" "GreenShop-priv2" {
+  vpc_id     = aws_vpc.GreenShop-vpc.id
   cidr_block = "10.0.3.0/24"
 
   tags = {
-    Name = "Ben-priv2"
+    Name = "GreenShop-priv2"
   }
 }
 
-resource "aws_subnet" "Ben-priv3" {
-  vpc_id     = aws_vpc.Ben-vpc.id
+resource "aws_subnet" "GreenShop-priv3" {
+  vpc_id     = aws_vpc.GreenShop-vpc.id
   cidr_block = "10.0.4.0/24"
 
   tags = {
-    Name = "Ben-priv3"
+    Name = "GreenShop-priv3"
   }
 }
