@@ -1,7 +1,7 @@
-resource "aws_vpc" "Ben-vpc" {
+resource "aws_vpc" "GreenShop-vpc" {
   cidr_block = "10.0.0.0/16"
 
   tags = {
-    Name = "Ben-vpc"
+    Name = "GreenShop-vpc"
   }
 }
