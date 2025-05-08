@@ -10,10 +10,10 @@ resource "local_file" "ansible_inventory" {
     web3_private_ip = aws_instance.GreenShop-INSTANCE-WEB3.private_ip,
     db_private_ip = aws_instance.GreenShop-INSTANCE-DB1.private_ip
   })
-  filename = "${path.module}/ansible/inventory.yml"
+  filename = "${path.module}/../ansible/inventory.yml"
   
   provisioner "local-exec" {
-    command = "mkdir -p ${path.module}/ansible"
+    command = "mkdir -p ${path.module}/../ansible"
   }
   
   depends_on = [
