@@ -6,58 +6,58 @@ all:
         adm1:
           ansible_host: ${admin_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
+          ansible_ssh_private_key_file: ../docs/admin.pem
     
     rproxy:
       hosts:
         rproxy1:
           ansible_host: ${rproxy_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
+          ansible_ssh_private_key_file: ../docs/admin.pem
     
     web:
       hosts:
         web1:
           ansible_host: ${web1_private_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
-          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
+          ansible_ssh_private_key_file: ../docs/admin.pem
+          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ../docs/admin.pem"'
         web2:
           ansible_host: ${web2_private_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
-          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
+          ansible_ssh_private_key_file: ../docs/admin.pem
+          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ../docs/admin.pem"'
         web3:
           ansible_host: ${web3_private_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
-          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
+          ansible_ssh_private_key_file: ../docs/admin.pem
+          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ../docs/admin.pem"'
     
     db:
       hosts:
         db1:
           ansible_host: ${db_private_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
-          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
+          ansible_ssh_private_key_file: ../docs/admin.pem
+          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ../docs/admin.pem"'
     
     jenkins:
       hosts:
         jenkins1:
           ansible_host: ${jenkins_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
+          ansible_ssh_private_key_file: ../docs/admin.pem
     
     monitoring:
       hosts:
         prometheus1:
           ansible_host: ${prometheus_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
+          ansible_ssh_private_key_file: ../docs/admin.pem
         grafana1:
           ansible_host: ${grafana_ip}
           ansible_user: ubuntu
-          ansible_ssh_private_key_file: ~/.ssh/admin.pem
+          ansible_ssh_private_key_file: ../docs/admin.pem
 
   vars:
     ansible_python_interpreter: /usr/bin/python3
