@@ -1,60 +1,60 @@
 ---
 all:
   children:
-    admin:
+    adm:
       hosts:
-        admin01:
+        adm1:
           ansible_host: ${admin_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
     
-    reverse_proxy:
+    rproxy:
       hosts:
-        rproxy01:
+        rproxy1:
           ansible_host: ${rproxy_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
     
-    web_servers:
+    web1:
       hosts:
-        web01:
+        web1:
           ansible_host: ${web1_private_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
           ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
-        web02:
+        web2:
           ansible_host: ${web2_private_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
           ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
-        web03:
+        web3:
           ansible_host: ${web3_private_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
           ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
     
-    database:
+    db:
       hosts:
-        db01:
+        db1:
           ansible_host: ${db_private_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
           ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ~/.ssh/admin.pem"'
     
-    ci_cd:
+    jenkins:
       hosts:
-        jenkins01:
+        jenkins1:
           ansible_host: ${jenkins_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
     
     monitoring:
       hosts:
-        prometheus01:
+        prometheus1:
           ansible_host: ${prometheus_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
-        grafana01:
+        grafana1:
           ansible_host: ${grafana_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/admin.pem
