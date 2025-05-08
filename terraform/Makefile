@@ -19,6 +19,9 @@ install-aws:
 configure-aws:
 	aws configure
 
+configure-aws_session_token:
+	aws configure set aws_session_token $(aws_session_token)
+
 init:
 	terraform init
 
