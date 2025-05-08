@@ -29,7 +29,7 @@ plan:
 	terraform plan
 
 apply:
-	terraform apply
+	terraform apply -auto-approve
 
 destroy:
-	terraform destroy
+	terraform destroy -auto-approve
