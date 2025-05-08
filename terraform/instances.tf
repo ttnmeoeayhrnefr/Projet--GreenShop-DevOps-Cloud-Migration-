@@ -23,7 +23,7 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
 
   user_data = <<-EOF
               #!/bin/bash
-              touch /tmp/test
+              sleep 60
               sudo apt update -y
               sudo apt install -y nginx
               sudo systemctl start nginx
@@ -68,7 +68,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB1" {
 
   user_data = <<-EOF
               #!/bin/bash
-              touch /tmp/test
+              sleep 60
               sudo apt update -y
               sudo apt install -y apache2 unzip
               sudo systemctl start apache2
@@ -91,7 +91,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB2" {
 
   user_data = <<-EOF
               #!/bin/bash
-              touch /tmp/test
+              sleep 60
               sudo apt update -y
               sudo apt install -y apache2 unzip
               sudo systemctl start apache2
@@ -114,7 +114,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
 
   user_data = <<-EOF
               #!/bin/bash
-              touch /tmp/test
+              sleep 60
               sudo apt update -y
               sudo apt install -y apache2 unzip
               sudo systemctl start apache2
@@ -137,7 +137,7 @@ resource "aws_instance" "GreenShop-INSTANCE-DB1" {
 
   user_data = <<-EOF
               #!/bin/bash
-              touch /tmp/test
+              sleep 60
               sudo apt update -y
               sudo apt install -y mariadb-server
               sudo systemctl start mariadb
