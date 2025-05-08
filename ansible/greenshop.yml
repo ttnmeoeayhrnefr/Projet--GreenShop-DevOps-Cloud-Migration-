@@ -73,3 +73,60 @@
       file:
         path: "{{ temp_dir.path }}"
         state: absent
+
+- name: Configure GreenShop Database
+  hosts: db1
+  become: yes
+  tasks:
+    - name: Create temporary directory on control node
+      delegate_to: localhost
+      become: no
+      file:
+        path: /tmp/db_transfer
+        state: directory
+      register: temp_dir
+
+    - name: Create archive of database
+      delegate_to: localhost
+      become: no
+      archive:
+        path: ../docs/greenshop_bdd.sql
+        dest: "{{ temp_dir.path }}/db.zip"
+        format: zip
+      register: archive_file
+
+    - name: Transfer archive to target
+      copy:
+        src: "{{ archive_file.dest }}"
+        dest: /tmp/db.zip
+
+    - name: Extract archive to target
+      unarchive:
+        src: /tmp/db.zip
+        dest: /tmp
+        remote_src: yes
+
+    - name: Install Python MySQL dependencies
+      package:
+        name: python3-pymysql
+        state: present
+
+    - name: Import MySQL dump using direct command
+      command: >
+        mysql -u root --execute="SOURCE /tmp/greenshop_bdd.sql" greenshop
+      register: import_result
+
+    - name: Remove temporary files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/db.zip
+        - /tmp/greenshop_bdd.sql
+
+    - name: Clean up temporary directory
+      delegate_to: localhost
+      become: no
+      file:
+        path: "{{ temp_dir.path }}"
+        state: absent
