@@ -1,10 +1,75 @@
 ---
-- name: test
-  hosts: web1
+- name: Update web directory
+  hosts: web
   become: yes
   tasks:
-    - name: test
+    - name: Create temporary directory on control node
+      delegate_to: localhost
+      become: no
       file:
-        path: /tmp/test
-        state: touch
-        mode: '0644'
+        path: /tmp/www_transfer
+        state: directory
+      register: temp_dir
+
+    - name: Create archive of web content
+      delegate_to: localhost
+      become: no
+      archive:
+        path: ../docs/www/*
+        dest: "{{ temp_dir.path }}/www.zip"
+        format: zip
+      register: archive_file
+
+    - name: Ensure www directory exists
+      file:
+        path: /var/www
+        state: directory
+        mode: '0755'
+
+    - name: Transfer archive to target
+      copy:
+        src: "{{ archive_file.dest }}"
+        dest: /tmp/www.zip
+
+    - name: Clean existing content while preserving directory
+      find:
+        paths: /var/www
+        recurse: yes
+        file_type: any
+      register: found_files
+
+    - name: Remove found files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ found_files.files }}"
+      when: found_files.matched > 0
+
+    - name: Extract archive to target
+      unarchive:
+        src: /tmp/www.zip
+        dest: /var/www/
+        remote_src: yes
+
+    - name: Set proper permissions on extracted files
+      file:
+        path: /var/www
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+        recurse: yes
+
+    - name: Remove temporary files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/www.zip
+
+    - name: Clean up temporary directory
+      delegate_to: localhost
+      become: no
+      file:
+        path: "{{ temp_dir.path }}"
+        state: absent
