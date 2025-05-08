@@ -5,6 +5,7 @@ resource "aws_instance" "GreenShop-INSTANCE-ADM" {
   subnet_id                = aws_subnet.GreenShop-pub.id
   instance_type            = "t2.micro"
   associate_public_ip_address = true
+  private_ip = "10.0.1.10"
 
   tags = {
     Name = "GreenShop-INSTANCE-ADM"
@@ -18,6 +19,7 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
   subnet_id                = aws_subnet.GreenShop-pub.id
   instance_type            = "t2.micro"
   associate_public_ip_address = true
+  private_ip ="10.0.1.11"
 
   user_data = <<-EOF
               #!/bin/bash
@@ -61,6 +63,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB1" {
   security_groups = [aws_security_group.GreenShop-SG-WEB.id]
   subnet_id       = aws_subnet.GreenShop-priv1.id
   instance_type   = "t2.micro"
+  private_ip ="10.0.2.5"
 
   user_data = <<-EOF
               #!/bin/bash
@@ -82,6 +85,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB2" {
   security_groups = [aws_security_group.GreenShop-SG-WEB.id]
   subnet_id       = aws_subnet.GreenShop-priv2.id
   instance_type   = "t2.micro"
+  private_ip ="10.0.3.5"
 
   user_data = <<-EOF
               #!/bin/bash
@@ -103,6 +107,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
   security_groups = [aws_security_group.GreenShop-SG-WEB.id]
   subnet_id       = aws_subnet.GreenShop-priv3.id
   instance_type   = "t2.micro"
+  private_ip ="10.0.4.5"
 
   user_data = <<-EOF
               #!/bin/bash
@@ -115,5 +120,27 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
 
   tags = {
     Name = "GreenShop-INSTANCE-WEB3"
+  }
+}
+
+resource "aws_instance" "GreenShop-INSTANCE-DB1" {
+  key_name                 = "admin"
+  ami                      = "ami-084568db4383264d4"
+  security_groups          = [aws_security_group.GreenShop-SG-DB.id]
+  subnet_id                = aws_subnet.GreenShop-priv4.id
+  instance_type            = "t2.micro"
+  private_ip = "10.0.5.5"
+
+  user_data = <<-EOF
+              #!/bin/bash
+              apt update -y
+              apt install -y mariadb-server
+              systemctl start mariadb
+              systemctl enable mariadb
+              mysql -e "CREATE DATABASE greenshop;"
+              EOF
+
+  tags = {
+    Name = "GreenShop-INSTANCE-DB1"
   }
 }

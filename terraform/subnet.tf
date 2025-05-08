@@ -33,3 +33,12 @@ resource "aws_subnet" "GreenShop-priv3" {
     Name = "GreenShop-priv3"
   }
 }
+
+resource "aws_subnet" "GreenShop-priv4" {
+  vpc_id     = aws_vpc.GreenShop-vpc.id
+  cidr_block = "10.0.5.0/24"
+
+  tags = {
+    Name = "GreenShop-priv4"
+  }
+}
