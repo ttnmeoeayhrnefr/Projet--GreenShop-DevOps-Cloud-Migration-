@@ -23,10 +23,10 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt update -y
-              apt install -y nginx
-              systemctl start nginx
-              systemctl enable nginx
+              sudo apt update -y
+              sudo apt install -y nginx
+              sudo systemctl start nginx
+              sudo systemctl enable nginx
               
               cat > /etc/nginx/conf.d/load-balancer.conf <<EOL
               upstream backend {
@@ -67,10 +67,10 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB1" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt update -y
-              apt install -y apache2
-              systemctl start apache2
-              systemctl enable apache2
+              sudo apt update -y
+              sudo apt install -y apache2
+              sudo systemctl start apache2
+              sudo systemctl enable apache2
               echo "Hello from instance 1" > /var/www/html/index.html
               EOF
 
@@ -89,10 +89,10 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB2" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt update -y
-              apt install -y apache2
-              systemctl start apache2
-              systemctl enable apache2
+              sudo apt update -y
+              sudo apt install -y apache2
+              sudo systemctl start apache2
+              sudo systemctl enable apache2
               echo "Hello from instance 2" > /var/www/html/index.html
               EOF
 
@@ -111,10 +111,10 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt update -y
-              apt install -y apache2
-              systemctl start apache2
-              systemctl enable apache2
+              sudo apt update -y
+              sudo apt install -y apache2
+              sudo systemctl start apache2
+              sudo systemctl enable apache2
               echo "Hello from instance 3" > /var/www/html/index.html
               EOF
 
@@ -133,11 +133,11 @@ resource "aws_instance" "GreenShop-INSTANCE-DB1" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt update -y
-              apt install -y mariadb-server
-              systemctl start mariadb
-              systemctl enable mariadb
-              mysql -e "CREATE DATABASE greenshop;"
+              sudo apt update -y
+              sudo apt install -y mariadb-server
+              sudo systemctl start mariadb
+              sudo systemctl enable mariadb
+              sudo mysql -e "CREATE DATABASE greenshop;"
               EOF
 
   tags = {
