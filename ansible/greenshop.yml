@@ -1,0 +1,10 @@
+---
+- name: test
+  hosts: web1
+  become: yes
+  tasks:
+    - name: test
+      file:
+        path: /tmp/test
+        state: touch
+        mode: '0644'
