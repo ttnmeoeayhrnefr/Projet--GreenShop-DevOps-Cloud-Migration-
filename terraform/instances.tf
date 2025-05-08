@@ -68,7 +68,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB1" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt update -y
-              sudo apt install -y apache2
+              sudo apt install -y apache2 unzip
               sudo systemctl start apache2
               sudo systemctl enable apache2
               echo "Hello from instance 1" > /var/www/html/index.html
@@ -90,7 +90,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB2" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt update -y
-              sudo apt install -y apache2
+              sudo apt install -y apache2 unzip
               sudo systemctl start apache2
               sudo systemctl enable apache2
               echo "Hello from instance 2" > /var/www/html/index.html
@@ -112,7 +112,7 @@ resource "aws_instance" "GreenShop-INSTANCE-WEB3" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt update -y
-              sudo apt install -y apache2
+              sudo apt install -y apache2 unzip
               sudo systemctl start apache2
               sudo systemctl enable apache2
               echo "Hello from instance 3" > /var/www/html/index.html
