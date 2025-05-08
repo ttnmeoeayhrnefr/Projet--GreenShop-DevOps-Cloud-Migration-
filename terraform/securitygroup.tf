@@ -93,6 +93,14 @@ resource "aws_security_group" "GreenShop-SG-DB" {
     security_groups = [aws_security_group.GreenShop-SG-ADM.id]
   }
 
+  ingress {
+    description = "Allow mysql from web"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = [aws_security_group.GreenShop-SG-WEB.id]
+  }
+
   egress {
     description = "Allow out Traffic"
     from_port   = 0
