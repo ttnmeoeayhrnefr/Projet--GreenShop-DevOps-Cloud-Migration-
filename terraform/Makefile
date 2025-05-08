@@ -22,6 +22,8 @@ configure-aws:
 configure-aws_session_token:
 	aws configure set aws_session_token $(aws_session_token)
 
+ipa: init plan apply
+
 init:
 	terraform init
 
