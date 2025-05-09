@@ -19,12 +19,12 @@
         state: directory
       register: temp_dir_apache2
 
-    - name: Create archive of web content
+    - name: Create archive of www content
       delegate_to: localhost
       become: no
       archive:
         path: ../docs/www/*
-        dest: "{{ temp_dir.path }}/www.zip"
+        dest: "{{ temp_dir_www.path }}/www.zip"
         format: zip
       register: archive_file_www
     
@@ -33,17 +33,17 @@
       become: no
       archive:
         path: ../docs/apache2/*
-        dest: "{{ temp_dir.path }}/apache2.zip"
+        dest: "{{ temp_dir_apache2.path }}/apache2.zip"
         format: zip
       register: archive_file_apache2
 
-    - name: Ensure www directory exists
+    - name: Ensure /var/www directory exists
       file:
         path: /var/www
         state: directory
         mode: '0755'
     
-    - name: Ensure apache2 directory exists
+    - name: Ensure /etc/apache2 directory exists
       file:
         path: /etc/apache2
         state: directory
@@ -51,22 +51,22 @@
 
     - name: Transfer www archive to target
       copy:
-        src: "{{ archive_file.dest }}"
+        src: "{{ archive_file_www.dest }}"
         dest: /tmp/www.zip
     
     - name: Transfer apache2 archive to target
       copy:
-        src: "{{ archive_file.dest }}"
+        src: "{{ archive_file_apache2.dest }}"
         dest: /tmp/apache2.zip
 
-    - name: Clean existing content while preserving directory
+    - name: Clean existing www content while preserving directory
       find:
         paths: /var/www
         recurse: yes
         file_type: any
       register: found_files_www
     
-    - name: Clean existing content while preserving directory
+    - name: Clean existing apache2 content while preserving directory
       find:
         paths: /etc/apache2
         recurse: yes
@@ -80,12 +80,10 @@
       with_items: "{{ found_files_www.files }}"
       when: found_files_www.matched > 0
     
-    - name: Remove apache2 found files
-      file:
-        path: "{{ item.path }}"
-        state: absent
-      with_items: "{{ found_files_apache2.files }}"
-      when: found_files_apache2.matched > 0
+    - name: Clean existing content
+      shell: "find /etc/apache2 -mindepth 1 -delete"
+      args:
+        executable: /bin/bash
 
     - name: Extract www archive to target
       unarchive:
