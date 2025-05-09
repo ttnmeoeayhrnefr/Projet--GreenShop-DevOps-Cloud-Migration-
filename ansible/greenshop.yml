@@ -12,6 +12,8 @@
     apache2_owner: "root"
     apache2_group: "root"
     file_mode: "0755"
+  vars_files:
+    - "./vault.yml"
   tasks:
     - name: Create temporary directories on control node
       delegate_to: localhost
@@ -101,15 +103,15 @@
 
     - name: Update database username in db.php
       lineinfile:
-        path: /var/www/db.php
+        path: /var/www/greenshop/db.php
         regexp: "\\$username = '.*';"
         line: "$username = '{{ vault_mysql_user_username }}';"
         backrefs: yes
       become: yes
 
-    - name: Update database password in /var/www/db.php
+    - name: Update database password in /var/www/greenshop/db.php
       lineinfile:
-        path: /var/www/db.php
+        path: /var/www/greenshop/db.php
         regexp: "\\$password = '.*';"
         line: "$password = '{{ vault_mysql_user_password }}';"
         backrefs: yes
