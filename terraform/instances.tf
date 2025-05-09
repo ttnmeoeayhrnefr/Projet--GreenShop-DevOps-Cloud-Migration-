@@ -28,27 +28,23 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
               sudo apt install -y nginx
               sudo systemctl start nginx
               sudo systemctl enable nginx
-              
               cat > /etc/nginx/conf.d/load-balancer.conf <<EOL
               upstream backend {
-                  server ${aws_instance.GreenShop-INSTANCE-WEB1.private_ip};
-                  server ${aws_instance.GreenShop-INSTANCE-WEB2.private_ip};
-                  server ${aws_instance.GreenShop-INSTANCE-WEB3.private_ip};
+              server ${aws_instance.GreenShop-INSTANCE-WEB1.private_ip};
+              server ${aws_instance.GreenShop-INSTANCE-WEB2.private_ip};
+              server ${aws_instance.GreenShop-INSTANCE-WEB3.private_ip};
               }
-
               server {
-                  listen 80;
-
-                  location / {
-                      proxy_pass http://backend;
-                      proxy_set_header Host \$host;
-                      proxy_set_header X-Real-IP \$remote_addr;
-                      proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                      proxy_set_header X-Forwarded-Proto \$scheme;
-                  }
+              listen 80;
+              location / {
+              proxy_pass http://backend;
+              proxy_set_header Host \$\$host;
+              proxy_set_header X-Real-IP \$\$remote_addr;
+              proxy_set_header X-Forwarded-For \$\$proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto \$\$scheme;
+              }
               }
               EOL
-              
               systemctl restart nginx
               EOF
 
