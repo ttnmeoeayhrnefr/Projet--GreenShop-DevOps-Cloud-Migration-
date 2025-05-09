@@ -99,6 +99,22 @@
       loop_control:
         label: "{{ item.dest }}"
 
+    - name: Update database username in db.php
+      lineinfile:
+        path: /var/www/db.php
+        regexp: "\\$username = '.*';"
+        line: "$username = '{{ vault_mysql_user_username }}';"
+        backrefs: yes
+      become: yes
+
+    - name: Update database password in /var/www/db.php
+      lineinfile:
+        path: /var/www/db.php
+        regexp: "\\$password = '.*';"
+        line: "$password = '{{ vault_mysql_user_password }}';"
+        backrefs: yes
+      become: yes
+
     - name: Set proper permissions on extracted files
       file:
         path: "{{ item.path }}"
@@ -212,8 +228,8 @@
 
     - name: Create MySQL user and grant privileges
       community.mysql.mysql_user:
-        name: "{{ mysql_user_username }}"
-        password: "{{ mysql_user_password }}"
+        name: "{{ vault_mysql_user_username }}"
+        password: "{{ vault_mysql_user_password }}"
         host: '%'
         priv: 'greenshop.*:ALL'
         state: present
