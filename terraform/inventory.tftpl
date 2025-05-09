@@ -15,7 +15,7 @@ all:
           ansible_host: ${rproxy_ip}
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ../docs/admin.pem
-          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+          ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@${admin_ip} -i ../docs/admin.pem" -o StrictHostKeyChecking=no'
     
     web:
       hosts:
