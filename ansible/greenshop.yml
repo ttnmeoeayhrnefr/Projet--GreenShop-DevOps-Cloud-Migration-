@@ -189,7 +189,7 @@
       delegate_to: localhost
       become: no
       archive:
-        path: ../docs/greenshop_bdd.sql
+        path: ../docs/greenshop_db.sql
         dest: "{{ temp_dir.path }}/db.zip"
         format: zip
       register: archive_file
@@ -212,7 +212,7 @@
 
     - name: Import MySQL dump using direct command
       command: >
-        mysql -u root --execute="SOURCE /tmp/greenshop_bdd.sql" greenshop
+        mysql -u root --execute="SOURCE /tmp/greenshop_db.sql" greenshop
       register: import_result
 
     - name: Remove temporary files
@@ -221,7 +221,7 @@
         state: absent
       loop:
         - /tmp/db.zip
-        - /tmp/greenshop_bdd.sql
+        - /tmp/greenshop_db.sql
 
     - name: Clean up temporary directory
       delegate_to: localhost
