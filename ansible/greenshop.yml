@@ -121,10 +121,45 @@
         mode: "0644"
         recurse: yes
 
+    - name: Add PHP repository
+      apt_repository:
+        repo: ppa:ondrej/php
+        state: present
+        update_cache: yes
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install PHP 8.1 and required modules
+      apt:
+        name:
+          - php8.1
+          - libapache2-mod-php8.1
+          - php8.1-mysql
+          - php8.1-common
+          - php8.1-cli
+        state: present
+        update_cache: no
+      register: php_install
+
+    - name: Enable PHP 8.1 module
+      command: a2enmod php8.1
+      register: php_enable
+      changed_when: "'already enabled' not in php_enable.stdout"
+      failed_when: false
+
+    - name: Validate Apache configuration
+      command: apache2ctl configtest
+      register: apache_config_test
+      changed_when: false
+      failed_when: apache_config_test.rc != 0
+
     - name: Restart Apache2
-      shell: "sudo systemctl restart apache2"
-      args:
-        executable: /bin/bash
+      service:
+        name: apache2
+        state: restarted
+      when: apache_config_test.rc == 0
 
     - name: Clean up temporary files
       file:
@@ -141,100 +176,56 @@
 - name: Configure GreenShop Database
   hosts: db1
   become: yes
-  vars:
-    db_src_file: "../docs/greenshop_bdd.sql"
-    db_name: "greenshop"
-    db_user: "root"
-    mysql_python_pkg: "python3-pymysql"
-    temp_dir_path: "/tmp/greenshop_db_transfer"
   tasks:
     - name: Create temporary directory on control node
       delegate_to: localhost
       become: no
       file:
-        path: "{{ temp_dir_path }}"
+        path: /tmp/db_transfer
         state: directory
-        mode: "0700"  # Secure permissions
       register: temp_dir
 
     - name: Create archive of database
       delegate_to: localhost
       become: no
       archive:
-        path: "{{ db_src_file }}"
-        dest: "{{ temp_dir_path }}/db.zip"
+        path: ../docs/greenshop_bdd.sql
+        dest: "{{ temp_dir.path }}/db.zip"
         format: zip
       register: archive_file
 
     - name: Transfer archive to target
       copy:
         src: "{{ archive_file.dest }}"
-        dest: "/tmp/db.zip"
-        mode: "0600"  # Secure permissions for sensitive files
-
-    - name: Backup existing database
-      mysql_db:
-        name: "{{ db_name }}"
-        state: dump
-        target: "/var/backups/{{ db_name }}_backup_{{ ansible_date_time.date }}.sql"
-      ignore_errors: yes
-      register: db_backup
+        dest: /tmp/db.zip
 
     - name: Extract archive to target
       unarchive:
-        src: "/tmp/db.zip"
-        dest: "/tmp"
+        src: /tmp/db.zip
+        dest: /tmp
         remote_src: yes
 
     - name: Install Python MySQL dependencies
       package:
-        name: "{{ mysql_python_pkg }}"
+        name: python3-pymysql
         state: present
 
-    - name: Check if database exists
-      command: mysql -e "SHOW DATABASES LIKE '{{ db_name }}';"
-      register: db_exists
-      changed_when: false
-      ignore_errors: yes
-
-    - name: Create database if not exists
-      mysql_db:
-        name: "{{ db_name }}"
-        state: present
-      when: db_name not in db_exists.stdout
-
-    - name: Import MySQL dump using mysql_db module
-      mysql_db:
-        name: "{{ db_name }}"
-        state: import
-        target: "/tmp/greenshop_bdd.sql"
+    - name: Import MySQL dump using direct command
+      command: >
+        mysql -u root --execute="SOURCE /tmp/greenshop_bdd.sql" greenshop
       register: import_result
-      ignore_errors: yes
-
-    - name: Import MySQL dump using direct command (fallback)
-      command: >
-        mysql -u {{ db_user }} --execute="SOURCE /tmp/greenshop_bdd.sql" {{ db_name }}
-      register: direct_import_result
-      when: import_result is failed
-      ignore_errors: yes
-
-    - name: Verify database import
-      command: >
-        mysql -u {{ db_user }} --execute="SHOW TABLES;" {{ db_name }}
-      register: verify_result
-      changed_when: false
-
-    - name: Debug database verification
-      debug:
-        var: verify_result.stdout_lines
 
     - name: Remove temporary files
       file:
         path: "{{ item }}"
         state: absent
       loop:
-        - "/tmp/db.zip"
-        - "/tmp/greenshop_bdd.sql"
-        - "{{ temp_dir_path }}"
-      loop_control:
-        label: "{{ item }}"
+        - /tmp/db.zip
+        - /tmp/greenshop_bdd.sql
+
+    - name: Clean up temporary directory
+      delegate_to: localhost
+      become: no
+      file:
+        path: "{{ temp_dir.path }}"
+        state: absent
