@@ -1,201 +1,232 @@
 ---
-- name: Update web directory
+- name: Update web directory and configure Apache
   hosts: web
   become: yes
+  vars:
+    www_src_path: "../docs/www/"
+    apache2_src_path: "../docs/apache2/"
+    www_dest_path: "/var/www"
+    apache2_dest_path: "/etc/apache2"
+    www_owner: "www-data"
+    www_group: "www-data"
+    apache2_owner: "root"
+    apache2_group: "root"
+    file_mode: "0755"
   tasks:
-    - name: Create temporary directory on control node for www
+    - name: Create temporary directories on control node
       delegate_to: localhost
       become: no
-      file:
-        path: /tmp/www_transfer
-        state: directory
-      register: temp_dir_www
-    
-    - name: Create temporary directory on control node for apache2
-      delegate_to: localhost
-      become: no
-      file:
-        path: /tmp/apache2_transfer
-        state: directory
-      register: temp_dir_apache2
-
-    - name: Create archive of www content
-      delegate_to: localhost
-      become: no
-      archive:
-        path: ../docs/www/*
-        dest: "{{ temp_dir_www.path }}/www.zip"
-        format: zip
-      register: archive_file_www
-    
-    - name: Create archive of apache2 content
-      delegate_to: localhost
-      become: no
-      archive:
-        path: ../docs/apache2/*
-        dest: "{{ temp_dir_apache2.path }}/apache2.zip"
-        format: zip
-      register: archive_file_apache2
-
-    - name: Ensure /var/www directory exists
-      file:
-        path: /var/www
-        state: directory
-        mode: '0755'
-    
-    - name: Ensure /etc/apache2 directory exists
-      file:
-        path: /etc/apache2
-        state: directory
-        mode: '0755'
-
-    - name: Transfer www archive to target
-      copy:
-        src: "{{ archive_file_www.dest }}"
-        dest: /tmp/www.zip
-    
-    - name: Transfer apache2 archive to target
-      copy:
-        src: "{{ archive_file_apache2.dest }}"
-        dest: /tmp/apache2.zip
-
-    - name: Clean existing www content while preserving directory
-      find:
-        paths: /var/www
-        recurse: yes
-        file_type: any
-      register: found_files_www
-    
-    - name: Clean existing apache2 content while preserving directory
-      find:
-        paths: /etc/apache2
-        recurse: yes
-        file_type: any
-      register: found_files_apache2
-
-    - name: Remove www found files
       file:
         path: "{{ item.path }}"
-        state: absent
-      with_items: "{{ found_files_www.files }}"
-      when: found_files_www.matched > 0
-    
-    - name: Clean existing content
-      shell: "find /etc/apache2 -mindepth 1 -delete"
+        state: directory
+        mode: "0700"  # Increased security with restricted permissions
+      loop:
+        - { path: "/tmp/greenshop_www", register: "temp_dir_www" }
+        - { path: "/tmp/greenshop_apache2", register: "temp_dir_apache2" }
+      loop_control:
+        label: "{{ item.path }}"
+      register: temp_dirs
+
+    - name: Create archives of content
+      delegate_to: localhost
+      become: no
+      archive:
+        path: "{{ item.src }}*"
+        dest: "{{ item.dest }}"
+        format: zip
+      loop:
+        - { src: "{{ www_src_path }}", dest: "/tmp/greenshop_www/www.zip", register: "archive_file_www" }
+        - { src: "{{ apache2_src_path }}", dest: "/tmp/greenshop_apache2/apache2.zip", register: "archive_file_apache2" }
+      loop_control:
+        label: "{{ item.dest }}"
+      register: archive_files
+
+    - name: Ensure required directories exist
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        mode: "{{ file_mode }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+      loop:
+        - { path: "{{ www_dest_path }}", owner: "{{ www_owner }}", group: "{{ www_group }}" }
+        - { path: "{{ apache2_dest_path }}", owner: "{{ apache2_owner }}", group: "{{ apache2_group }}" }
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Backup existing directories
+      archive:
+        path: "{{ item.path }}"
+        dest: "/var/backups/{{ item.name }}_backup_{{ ansible_date_time.date }}.tar.gz"
+        format: gz
+      loop:
+        - { path: "{{ www_dest_path }}", name: "www" }
+        - { path: "{{ apache2_dest_path }}", name: "apache2" }
+      loop_control:
+        label: "{{ item.path }}"
+      register: backup_result
+      ignore_errors: yes
+
+    - name: Transfer archives to target
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "0600"  # Secure permissions for sensitive files
+      loop:
+        - { src: "/tmp/greenshop_www/www.zip", dest: "/tmp/www.zip" }
+        - { src: "/tmp/greenshop_apache2/apache2.zip", dest: "/tmp/apache2.zip" }
+      loop_control:
+        label: "{{ item.dest }}"
+
+    - name: Clean existing content safely
+      shell: "find {{ item }} -mindepth 1 -delete"
+      args:
+        executable: /bin/bash
+      loop:
+        - "{{ www_dest_path }}"
+        - "{{ apache2_dest_path }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Extract archives to target
+      unarchive:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        remote_src: yes
+      loop:
+        - { src: "/tmp/www.zip", dest: "{{ www_dest_path }}/" }
+        - { src: "/tmp/apache2.zip", dest: "{{ apache2_dest_path }}/" }
+      loop_control:
+        label: "{{ item.dest }}"
+
+    - name: Set proper permissions on extracted files
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ file_mode }}"
+        recurse: yes
+      loop:
+        - { path: "{{ www_dest_path }}", owner: "{{ www_owner }}", group: "{{ www_group }}" }
+        - { path: "{{ apache2_dest_path }}", owner: "{{ apache2_owner }}", group: "{{ apache2_group }}" }
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Clean existing content safely
+      shell: "sudo systemctl restart apache2"
       args:
         executable: /bin/bash
 
-    - name: Extract www archive to target
-      unarchive:
-        src: /tmp/www.zip
-        dest: /var/www/
-        remote_src: yes
-    
-    - name: Extract apache2 archive to target
-      unarchive:
-        src: /tmp/apache2.zip
-        dest: /etc/apache2/
-        remote_src: yes
-
-    - name: Set proper permissions on www extracted files
-      file:
-        path: /var/www
-        state: directory
-        owner: www-data
-        group: www-data
-        mode: '0755'
-        recurse: yes
-    
-    - name: Set proper permissions on apache2 extracted files
-      file:
-        path: /etc/apache2
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-        recurse: yes
-
-    - name: Remove www temporary files
+    - name: Clean up temporary files
       file:
         path: "{{ item }}"
         state: absent
       loop:
-        - /tmp/www.zip
-    
-    - name: Remove apache2 temporary files
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - /tmp/apache2.zip
-
-    - name: Clean up www temporary directory
-      delegate_to: localhost
-      become: no
-      file:
-        path: "{{ temp_dir_www.path }}"
-        state: absent
-    
-    - name: Clean up apache2 temporary directory
-      delegate_to: localhost
-      become: no
-      file:
-        path: "{{ temp_dir_apache2.path }}"
-        state: absent
+        - "/tmp/www.zip"
+        - "/tmp/apache2.zip"
+        - "/tmp/greenshop_www"
+        - "/tmp/greenshop_apache2"
+      loop_control:
+        label: "{{ item }}"
 
 - name: Configure GreenShop Database
   hosts: db1
   become: yes
+  vars:
+    db_src_file: "../docs/greenshop_bdd.sql"
+    db_name: "greenshop"
+    db_user: "root"
+    mysql_python_pkg: "python3-pymysql"
+    temp_dir_path: "/tmp/greenshop_db_transfer"
   tasks:
     - name: Create temporary directory on control node
       delegate_to: localhost
       become: no
       file:
-        path: /tmp/db_transfer
+        path: "{{ temp_dir_path }}"
         state: directory
+        mode: "0700"  # Secure permissions
       register: temp_dir
 
     - name: Create archive of database
       delegate_to: localhost
       become: no
       archive:
-        path: ../docs/greenshop_bdd.sql
-        dest: "{{ temp_dir.path }}/db.zip"
+        path: "{{ db_src_file }}"
+        dest: "{{ temp_dir_path }}/db.zip"
         format: zip
       register: archive_file
 
     - name: Transfer archive to target
       copy:
         src: "{{ archive_file.dest }}"
-        dest: /tmp/db.zip
+        dest: "/tmp/db.zip"
+        mode: "0600"  # Secure permissions for sensitive files
+
+    - name: Backup existing database
+      mysql_db:
+        name: "{{ db_name }}"
+        state: dump
+        target: "/var/backups/{{ db_name }}_backup_{{ ansible_date_time.date }}.sql"
+      ignore_errors: yes
+      register: db_backup
 
     - name: Extract archive to target
       unarchive:
-        src: /tmp/db.zip
-        dest: /tmp
+        src: "/tmp/db.zip"
+        dest: "/tmp"
         remote_src: yes
 
     - name: Install Python MySQL dependencies
       package:
-        name: python3-pymysql
+        name: "{{ mysql_python_pkg }}"
         state: present
 
-    - name: Import MySQL dump using direct command
-      command: >
-        mysql -u root --execute="SOURCE /tmp/greenshop_bdd.sql" greenshop
+    - name: Check if database exists
+      command: mysql -e "SHOW DATABASES LIKE '{{ db_name }}';"
+      register: db_exists
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Create database if not exists
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+      when: db_name not in db_exists.stdout
+
+    - name: Import MySQL dump using mysql_db module
+      mysql_db:
+        name: "{{ db_name }}"
+        state: import
+        target: "/tmp/greenshop_bdd.sql"
       register: import_result
+      ignore_errors: yes
+
+    - name: Import MySQL dump using direct command (fallback)
+      command: >
+        mysql -u {{ db_user }} --execute="SOURCE /tmp/greenshop_bdd.sql" {{ db_name }}
+      register: direct_import_result
+      when: import_result is failed
+      ignore_errors: yes
+
+    - name: Verify database import
+      command: >
+        mysql -u {{ db_user }} --execute="SHOW TABLES;" {{ db_name }}
+      register: verify_result
+      changed_when: false
+
+    - name: Debug database verification
+      debug:
+        var: verify_result.stdout_lines
 
     - name: Remove temporary files
       file:
         path: "{{ item }}"
         state: absent
       loop:
-        - /tmp/db.zip
-        - /tmp/greenshop_bdd.sql
-
-    - name: Clean up temporary directory
-      delegate_to: localhost
-      become: no
-      file:
-        path: "{{ temp_dir.path }}"
-        state: absent
+        - "/tmp/db.zip"
+        - "/tmp/greenshop_bdd.sql"
+        - "{{ temp_dir_path }}"
+      loop_control:
+        label: "{{ item }}"
