@@ -44,7 +44,6 @@ ssh-db1:
 	$(eval PROXY_CMD := $(shell ansible-inventory -i ./inventory.yml --host db1 | jq -r '.ansible_ssh_common_args'))
 	ssh -o StrictHostKeyChecking=no $(PROXY_CMD) -i $(DB1_KEY) $(DB1_USER)@$(DB1_HOST)
 
-
 forget:
 	ssh-keygen -f '/home/theo/.ssh/known_hosts' -R '10.0.2.5'
 	ssh-keygen -f '/home/theo/.ssh/known_hosts' -R '10.0.3.5'
