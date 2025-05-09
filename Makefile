@@ -12,6 +12,6 @@ configure-aws_session_token:
 
 greenshop:
 	cd terraform && make ipa
-	sleep 150
+	sleep 300
 	cd ansible && make greenshop
 	cd prometheus+grafana && make monitoring
