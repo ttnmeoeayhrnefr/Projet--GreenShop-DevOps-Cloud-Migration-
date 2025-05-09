@@ -240,7 +240,7 @@
 
     - name: Create MySQL greenshop user
       command: >
-        sudo mysql -e "CREATE USER '{{ vault_mysql_user_username }}'@'localhost' IDENTIFIED BY '{{ vault_mysql_user_password }}'; GRANT ALL PRIVILEGES ON greenshop.* TO 'toto'@'localhost'; FLUSH PRIVILEGES;"
+        sudo mysql -e "CREATE USER IF NOT EXISTS '{{ vault_mysql_user_username }}'@'localhost' IDENTIFIED BY '{{ vault_mysql_user_password }}'; GRANT ALL PRIVILEGES ON greenshop.* TO '{{ vault_mysql_user_username }}'@'localhost'; FLUSH PRIVILEGES;"
       register: user_creation_result
 
     - name: Import MySQL dump using
