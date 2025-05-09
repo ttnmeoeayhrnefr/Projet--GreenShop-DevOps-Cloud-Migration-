@@ -16,6 +16,12 @@ ssh-adm1:
 	$(eval ADM1_KEY := $(shell ansible-inventory -i ./inventory.yml --host adm1 | jq -r '.ansible_ssh_private_key_file'))
 	ssh -i $(ADM1_KEY) $(ADM1_USER)@$(ADM1_HOST)
 
+ssh-rproxy1:
+	$(eval RPROXY1_HOST := $(shell ansible-inventory -i ./inventory.yml --host rproxy1 | jq -r '.ansible_host'))
+	$(eval RPROXY1_USER := $(shell ansible-inventory -i ./inventory.yml --host rproxy1 | jq -r '.ansible_user'))
+	$(eval RPROXY1_KEY := $(shell ansible-inventory -i ./inventory.yml --host rproxy1 | jq -r '.ansible_ssh_private_key_file'))
+	ssh -i $(RPROXY1_KEY) $(RPROXY1_USER)@$(RPROXY1_HOST)
+
 ssh-web1:
 	$(eval WEB1_HOST := $(shell ansible-inventory -i ./inventory.yml --host web1 | jq -r '.ansible_host'))
 	$(eval WEB1_USER := $(shell ansible-inventory -i ./inventory.yml --host web1 | jq -r '.ansible_user'))
