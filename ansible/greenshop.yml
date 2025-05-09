@@ -3,13 +3,21 @@
   hosts: web
   become: yes
   tasks:
-    - name: Create temporary directory on control node
+    - name: Create temporary directory on control node for www
       delegate_to: localhost
       become: no
       file:
         path: /tmp/www_transfer
         state: directory
-      register: temp_dir
+      register: temp_dir_www
+    
+    - name: Create temporary directory on control node for apache2
+      delegate_to: localhost
+      become: no
+      file:
+        path: /tmp/apache2_transfer
+        state: directory
+      register: temp_dir_apache2
 
     - name: Create archive of web content
       delegate_to: localhost
@@ -18,40 +26,80 @@
         path: ../docs/www/*
         dest: "{{ temp_dir.path }}/www.zip"
         format: zip
-      register: archive_file
+      register: archive_file_www
+    
+    - name: Create archive of apache2 content
+      delegate_to: localhost
+      become: no
+      archive:
+        path: ../docs/apache2/*
+        dest: "{{ temp_dir.path }}/apache2.zip"
+        format: zip
+      register: archive_file_apache2
 
     - name: Ensure www directory exists
       file:
         path: /var/www
         state: directory
         mode: '0755'
+    
+    - name: Ensure apache2 directory exists
+      file:
+        path: /etc/apache2
+        state: directory
+        mode: '0755'
 
-    - name: Transfer archive to target
+    - name: Transfer www archive to target
       copy:
         src: "{{ archive_file.dest }}"
         dest: /tmp/www.zip
+    
+    - name: Transfer apache2 archive to target
+      copy:
+        src: "{{ archive_file.dest }}"
+        dest: /tmp/apache2.zip
 
     - name: Clean existing content while preserving directory
       find:
         paths: /var/www
         recurse: yes
         file_type: any
-      register: found_files
+      register: found_files_www
+    
+    - name: Clean existing content while preserving directory
+      find:
+        paths: /etc/apache2
+        recurse: yes
+        file_type: any
+      register: found_files_apache2
 
-    - name: Remove found files
+    - name: Remove www found files
       file:
         path: "{{ item.path }}"
         state: absent
-      with_items: "{{ found_files.files }}"
-      when: found_files.matched > 0
+      with_items: "{{ found_files_www.files }}"
+      when: found_files_www.matched > 0
+    
+    - name: Remove apache2 found files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ found_files_apache2.files }}"
+      when: found_files_apache2.matched > 0
 
-    - name: Extract archive to target
+    - name: Extract www archive to target
       unarchive:
         src: /tmp/www.zip
         dest: /var/www/
         remote_src: yes
+    
+    - name: Extract apache2 archive to target
+      unarchive:
+        src: /tmp/apache2.zip
+        dest: /etc/apache2/
+        remote_src: yes
 
-    - name: Set proper permissions on extracted files
+    - name: Set proper permissions on www extracted files
       file:
         path: /var/www
         state: directory
@@ -59,19 +107,42 @@
         group: www-data
         mode: '0755'
         recurse: yes
+    
+    - name: Set proper permissions on apache2 extracted files
+      file:
+        path: /etc/apache2
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+        recurse: yes
 
-    - name: Remove temporary files
+    - name: Remove www temporary files
       file:
         path: "{{ item }}"
         state: absent
       loop:
         - /tmp/www.zip
+    
+    - name: Remove apache2 temporary files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/apache2.zip
 
-    - name: Clean up temporary directory
+    - name: Clean up www temporary directory
       delegate_to: localhost
       become: no
       file:
-        path: "{{ temp_dir.path }}"
+        path: "{{ temp_dir_www.path }}"
+        state: absent
+    
+    - name: Clean up apache2 temporary directory
+      delegate_to: localhost
+      become: no
+      file:
+        path: "{{ temp_dir_apache2.path }}"
         state: absent
 
 - name: Configure GreenShop Database
