@@ -12,4 +12,5 @@ configure-aws_session_token:
 
 greenshop:
 	cd terraform && make ipa
+	sleep 60
 	cd ansible && make greenshop
