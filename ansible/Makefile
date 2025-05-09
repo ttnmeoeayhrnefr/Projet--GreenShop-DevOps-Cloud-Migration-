@@ -8,7 +8,7 @@ requirements:
 	ansible-galaxy install --force -r requirements.yml
 
 greenshop:
-	ansible-playbook -i inventory.yml greenshop.yml
+	ansible-playbook -i inventory.yml greenshop.yml --ask-vault-pass
 
 ssh-adm1:
 	$(eval ADM1_HOST := $(shell ansible-inventory -i ./inventory.yml --host adm1 | jq -r '.ansible_host'))

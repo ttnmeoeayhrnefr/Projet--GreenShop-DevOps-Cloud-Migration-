@@ -210,9 +210,19 @@
         name: python3-pymysql
         state: present
 
+    - name: Create MySQL user and grant privileges
+      community.mysql.mysql_user:
+        name: "{{ mysql_user_username }}"
+        password: "{{ mysql_user_password }}"
+        host: '%'
+        priv: 'greenshop.*:ALL'
+        state: present
+        login_user: root
+      no_log: true
+
     - name: Import MySQL dump using direct command
       command: >
-        mysql -u root --execute="SOURCE /tmp/greenshop_db.sql" greenshop
+        sudo mysql -u root --execute="SOURCE /tmp/greenshop_db.sql" greenshop
       register: import_result
 
     - name: Remove temporary files
