@@ -113,7 +113,15 @@
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Clean existing content safely
+    - name: Ensure Apache config files have correct permissions
+      file:
+        path: "{{ apache2_dest_path }}/sites-available"
+        owner: "{{ apache2_owner }}"
+        group: "{{ apache2_group }}"
+        mode: "0644"
+        recurse: yes
+
+    - name: Restart Apache2
       shell: "sudo systemctl restart apache2"
       args:
         executable: /bin/bash
