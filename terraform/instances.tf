@@ -139,7 +139,7 @@ resource "aws_instance" "GreenShop-INSTANCE-DB1" {
               #!/bin/bash
               sleep 60
               sudo apt update -y
-              sudo apt install -y mariadb-server
+              sudo apt install -y mariadb-server unzip
               sudo systemctl start mariadb
               sudo systemctl enable mariadb
               sudo mysql -e "CREATE DATABASE greenshop;"
