@@ -63,6 +63,13 @@ all:
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ../docs/admin.pem
           ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+    prometheus_targets:
+      hosts:
+        prometheus1:
+          ansible_host: ${prometheus_ip}
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ../docs/admin.pem
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
 
   vars:
     ansible_python_interpreter: /usr/bin/python3
