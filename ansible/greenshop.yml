@@ -21,7 +21,7 @@
       file:
         path: "{{ item.path }}"
         state: directory
-        mode: "0700"  # Increased security with restricted permissions
+        mode: "0700"
       loop:
         - { path: "/tmp/greenshop_www", register: "temp_dir_www" }
         - { path: "/tmp/greenshop_apache2", register: "temp_dir_apache2" }
