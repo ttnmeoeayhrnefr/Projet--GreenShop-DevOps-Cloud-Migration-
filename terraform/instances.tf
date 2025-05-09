@@ -26,8 +26,8 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
               sleep 60
               sudo apt update -y
               sudo apt install -y nginx
-              sudo systemctl start nginx
-              sudo systemctl enable nginx
+              
+              sudo rm /etc/nginx/sites-enabled/default
               
               cat > /etc/nginx/conf.d/load-balancer.conf <<EOL
               upstream backend {
@@ -37,7 +37,8 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
               }
 
               server {
-                  listen 80;
+                  listen 80 default_server;
+                  server_name _;
 
                   location / {
                       proxy_pass http://backend;
@@ -49,7 +50,8 @@ resource "aws_instance" "GreenShop-INSTANCE-RPROXY" {
               }
               EOL
               
-              systemctl restart nginx
+              sudo systemctl restart nginx
+              sudo systemctl enable nginx
               EOF
 
   tags = {
@@ -139,7 +141,7 @@ resource "aws_instance" "GreenShop-INSTANCE-DB1" {
               #!/bin/bash
               sleep 60
               sudo apt update -y
-              sudo apt install -y mariadb-server
+              sudo apt install -y mariadb-server unzip
               sudo systemctl start mariadb
               sudo systemctl enable mariadb
               sudo mysql -e "CREATE DATABASE greenshop;"

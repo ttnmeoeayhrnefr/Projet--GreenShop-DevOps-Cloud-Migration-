@@ -1,5 +1,5 @@
 ---
-- hosts: prometheus_targets
+- hosts: prometheus1
   become: true
   vars:
     monitoring_path: /srv/prometheus
@@ -37,108 +37,108 @@
         src: "./docker/caddy/prometheus/Caddyfile"
         dest: "{{ monitoring_path }}/caddy/Caddyfile"
 
-    - name: Ensure /etc/iptables directory exists
-      ansible.builtin.file:
-        path: /etc/iptables
-        state: directory
-
-    - name: Flush existing iptables rules
-      ansible.builtin.iptables:
-        flush: yes
-        table: filter
-
-    - name: Allow incoming Monitoring traffic on port 9090
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: 9090
-        source: "{{ item }}"
-        jump: ACCEPT
-        state: present
-      loop: "{{ monitoring_server_allowed_ip }}"
-
-    - name: Allow incoming Monitoring traffic on port 9091
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: 9091
-        source: "{{ item }}"
-        jump: ACCEPT
-        state: present
-      loop: "{{ monitoring_server_allowed_ip }}"
-
-    - name: Allow incoming Monitoring traffic on port 8085
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: 8085
-        source: "{{ item }}"
-        jump: ACCEPT
-        state: present
-      loop: "{{ monitoring_server_allowed_ip }}"
-
-    - name: Allow incoming Monitoring traffic on port 8080
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: 8080
-        source: "{{ item }}"
-        jump: ACCEPT
-        state: present
-      loop: "{{ monitoring_server_allowed_ip }}"
-
-    - name: Allow incoming Monitoring traffic on port 9100
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: 9100
-        source: "{{ item }}"
-        jump: ACCEPT
-        state: present
-      loop: "{{ monitoring_server_allowed_ip }}"
-
-    - name: Drop all other incoming TCP traffic
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: "{{ item }}"
-        jump: DROP
-        state: present
-      loop:
-        - "9090"
-        - "9091"
-        - "8085"
-        - "8080"
-        - "9100"
-
-    - name: Check current iptables rules
-      ansible.builtin.command: iptables -L
-      register: iptables_output
-      check_mode: no
-      changed_when: false
-
-    - name: Drop all other incoming UDP traffic
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: udp
-        destination_port: "{{ item }}"
-        jump: DROP
-        state: present
-      loop:
-        - "9090"
-        - "9091"
-        - "8085"
-        - "8080"
-        - "9100"
-
-    - name: Execute iptables save and capture output
-      ansible.builtin.shell: iptables-save
-      register: iptables_output
-
-    - name: Save iptables rules
-      ansible.builtin.copy:
-        content: "{{ iptables_output.stdout }}"
-        dest: /etc/iptables/rules.v4
+#    - name: Ensure /etc/iptables directory exists
+#      ansible.builtin.file:
+#        path: /etc/iptables
+#        state: directory
+#
+#    - name: Flush existing iptables rules
+#      ansible.builtin.iptables:
+#        flush: yes
+#        table: filter
+#
+#    - name: Allow incoming Monitoring traffic on port 9090
+#      ansible.builtin.iptables:
+#        chain: INPUT
+#        protocol: tcp
+#        destination_port: 9090
+#        source: "{{ item }}"
+#        jump: ACCEPT
+#        state: present
+#      loop: "{{ monitoring_server_allowed_ip }}"
+#
+#    - name: Allow incoming Monitoring traffic on port 9091
+#      ansible.builtin.iptables:
+#        chain: INPUT
+#        protocol: tcp
+#        destination_port: 9091
+#        source: "{{ item }}"
+#        jump: ACCEPT
+#        state: present
+#      loop: "{{ monitoring_server_allowed_ip }}"
+#
+#    - name: Allow incoming Monitoring traffic on port 8085
+#      ansible.builtin.iptables:
+#        chain: INPUT
+#        protocol: tcp
+#        destination_port: 8085
+#        source: "{{ item }}"
+#        jump: ACCEPT
+#        state: present
+#      loop: "{{ monitoring_server_allowed_ip }}"
+#
+#    - name: Allow incoming Monitoring traffic on port 8080
+#      ansible.builtin.iptables:
+#        chain: INPUT
+#        protocol: tcp
+#        destination_port: 8080
+#        source: "{{ item }}"
+#        jump: ACCEPT
+#        state: present
+#      loop: "{{ monitoring_server_allowed_ip }}"
+#
+#    - name: Allow incoming Monitoring traffic on port 9100
+#      ansible.builtin.iptables:
+#        chain: INPUT
+#        protocol: tcp
+#        destination_port: 9100
+#        source: "{{ item }}"
+#        jump: ACCEPT
+#        state: present
+#      loop: "{{ monitoring_server_allowed_ip }}"
+#
+#    - name: Drop all other incoming TCP traffic
+#      ansible.builtin.iptables:
+#        chain: INPUT
+#        protocol: tcp
+#        destination_port: "{{ item }}"
+#        jump: DROP
+#        state: present
+#      loop:
+#        - "9090"
+#        - "9091"
+#        - "8085"
+#        - "8080"
+#        - "9100"
+#
+#    - name: Check current iptables rules
+#      ansible.builtin.command: iptables -L
+#      register: iptables_output
+#      check_mode: no
+#      changed_when: false
+#
+#    - name: Drop all other incoming UDP traffic
+#      ansible.builtin.iptables:
+#        chain: INPUT
+#        protocol: udp
+#        destination_port: "{{ item }}"
+#        jump: DROP
+#        state: present
+#      loop:
+#        - "9090"
+#        - "9091"
+#        - "8085"
+#        - "8080"
+#        - "9100"
+#
+#    - name: Execute iptables save and capture output
+#      ansible.builtin.shell: iptables-save
+#      register: iptables_output
+#
+#    - name: Save iptables rules
+#      ansible.builtin.copy:
+#        content: "{{ iptables_output.stdout }}"
+#        dest: /etc/iptables/rules.v4
 
     - name: Create and start services
       community.docker.docker_compose_v2:

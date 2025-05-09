@@ -146,18 +146,10 @@ resource "aws_security_group" "GreenShop-SG-PROMETHEUS" {
   vpc_id      = aws_vpc.GreenShop-vpc.id
 
   ingress {
-    description = "Allow SSH from External"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_ssh_ips
-  }
-
-  ingress {
-    description = "Allow HTTP from External"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    description = "Allow all inbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -176,18 +168,10 @@ resource "aws_security_group" "GreenShop-SG-GRAFANA" {
   vpc_id      = aws_vpc.GreenShop-vpc.id
 
   ingress {
-    description = "Allow SSH from External"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_ssh_ips
-  }
-
-  ingress {
-    description = "Allow HTTP from External"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    description = "Allow all inbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 

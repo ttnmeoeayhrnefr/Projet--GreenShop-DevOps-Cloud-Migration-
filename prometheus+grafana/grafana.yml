@@ -1,5 +1,5 @@
 ---
-- hosts: EXAMPLE
+- hosts: grafana1
   become: true
   vars:
     monitoring_path: /srv/grafana
@@ -65,24 +65,24 @@
         src: "./docker/caddy/grafana/Caddyfile"
         dest: "{{ monitoring_path }}/caddy/Caddyfile"
 
-    - name: Ensure /etc/iptables directory exists
-      ansible.builtin.file:
-        path: /etc/iptables
-        state: directory
-
-    - name: Flush existing iptables rules
-      ansible.builtin.iptables:
-        flush: yes
-        table: filter
-
-    - name: Execute iptables save and capture output
-      ansible.builtin.shell: iptables-save
-      register: iptables_output
-
-    - name: Save iptables rules
-      ansible.builtin.copy:
-        content: "{{ iptables_output.stdout }}"
-        dest: /etc/iptables/rules.v4
+#    - name: Ensure /etc/iptables directory exists
+#      ansible.builtin.file:
+#        path: /etc/iptables
+#        state: directory
+#
+#    - name: Flush existing iptables rules
+#      ansible.builtin.iptables:
+#        flush: yes
+#        table: filter
+#
+#    - name: Execute iptables save and capture output
+#      ansible.builtin.shell: iptables-save
+#      register: iptables_output
+#
+#    - name: Save iptables rules
+#      ansible.builtin.copy:
+#        content: "{{ iptables_output.stdout }}"
+#        dest: /etc/iptables/rules.v4
 
     - name: Create and start services
       community.docker.docker_compose_v2:
