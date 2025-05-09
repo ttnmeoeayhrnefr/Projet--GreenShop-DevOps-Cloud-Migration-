@@ -101,6 +101,14 @@
       loop_control:
         label: "{{ item.dest }}"
 
+    - name: Update database host in db.php
+      lineinfile:
+        path: /var/www/greenshop/db.php
+        regexp: '^\$host = .*$'
+        line: '$host = ''{{ hostvars["db1"]["ansible_host"] }}'';'
+        backrefs: yes
+      when: hostvars["db1"] is defined
+
     - name: Update database username in db.php
       lineinfile:
         path: /var/www/greenshop/db.php
