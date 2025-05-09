@@ -1,5 +1,16 @@
 apiVersion: 1
 contactPoints:
   - orgId: 1
-    name: EXAMPLE
+    name: test
     receivers:
+      - uid: cedgag2ni6y2od
+        type: slack
+        settings:
+          recipient: C089E21B8B0
+          token: xoxb-543376777923-8329598074196-qET2tlN672Bjo4lKv6TFCgWf
+        disableResolveMessage: false
+      - uid: eeaog6qghdou8e
+        type: email
+        settings:
+          addresses: monitoring@digitalseeder.com
+        disableResolveMessage: false
