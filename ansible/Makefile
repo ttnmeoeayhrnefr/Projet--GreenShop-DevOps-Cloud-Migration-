@@ -14,35 +14,35 @@ ssh-adm1:
 	$(eval ADM1_HOST := $(shell ansible-inventory -i ./inventory.yml --host adm1 | jq -r '.ansible_host'))
 	$(eval ADM1_USER := $(shell ansible-inventory -i ./inventory.yml --host adm1 | jq -r '.ansible_user'))
 	$(eval ADM1_KEY := $(shell ansible-inventory -i ./inventory.yml --host adm1 | jq -r '.ansible_ssh_private_key_file'))
-	ssh -o StrictHostKeyChecking=no -i $(ADM1_KEY) $(ADM1_USER)@$(ADM1_HOST)
+	ssh -i $(ADM1_KEY) $(ADM1_USER)@$(ADM1_HOST)
 
 ssh-web1:
 	$(eval WEB1_HOST := $(shell ansible-inventory -i ./inventory.yml --host web1 | jq -r '.ansible_host'))
 	$(eval WEB1_USER := $(shell ansible-inventory -i ./inventory.yml --host web1 | jq -r '.ansible_user'))
 	$(eval WEB1_KEY := $(shell ansible-inventory -i ./inventory.yml --host web1 | jq -r '.ansible_ssh_private_key_file'))
 	$(eval PROXY_CMD := $(shell ansible-inventory -i ./inventory.yml --host web1 | jq -r '.ansible_ssh_common_args'))
-	ssh -o StrictHostKeyChecking=no $(PROXY_CMD) -i $(WEB1_KEY) $(WEB1_USER)@$(WEB1_HOST)
+	ssh $(PROXY_CMD) -i $(WEB1_KEY) $(WEB1_USER)@$(WEB1_HOST)
 
 ssh-web2:
 	$(eval WEB2_HOST := $(shell ansible-inventory -i ./inventory.yml --host web2 | jq -r '.ansible_host'))
 	$(eval WEB2_USER := $(shell ansible-inventory -i ./inventory.yml --host web2 | jq -r '.ansible_user'))
 	$(eval WEB2_KEY := $(shell ansible-inventory -i ./inventory.yml --host web2 | jq -r '.ansible_ssh_private_key_file'))
 	$(eval PROXY_CMD := $(shell ansible-inventory -i ./inventory.yml --host web2 | jq -r '.ansible_ssh_common_args'))
-	ssh -o StrictHostKeyChecking=no $(PROXY_CMD) -i $(WEB2_KEY) $(WEB2_USER)@$(WEB2_HOST)
+	ssh $(PROXY_CMD) -i $(WEB2_KEY) $(WEB2_USER)@$(WEB2_HOST)
 
 ssh-web3:
 	$(eval WEB3_HOST := $(shell ansible-inventory -i ./inventory.yml --host web3 | jq -r '.ansible_host'))
 	$(eval WEB3_USER := $(shell ansible-inventory -i ./inventory.yml --host web3 | jq -r '.ansible_user'))
 	$(eval WEB3_KEY := $(shell ansible-inventory -i ./inventory.yml --host web3 | jq -r '.ansible_ssh_private_key_file'))
 	$(eval PROXY_CMD := $(shell ansible-inventory -i ./inventory.yml --host web3 | jq -r '.ansible_ssh_common_args'))
-	ssh -o StrictHostKeyChecking=no $(PROXY_CMD) -i $(WEB3_KEY) $(WEB3_USER)@$(WEB3_HOST)
+	ssh $(PROXY_CMD) -i $(WEB3_KEY) $(WEB3_USER)@$(WEB3_HOST)
 
 ssh-db1:
 	$(eval DB1_HOST := $(shell ansible-inventory -i ./inventory.yml --host db1 | jq -r '.ansible_host'))
 	$(eval DB1_USER := $(shell ansible-inventory -i ./inventory.yml --host db1 | jq -r '.ansible_user'))
 	$(eval DB1_KEY := $(shell ansible-inventory -i ./inventory.yml --host db1 | jq -r '.ansible_ssh_private_key_file'))
 	$(eval PROXY_CMD := $(shell ansible-inventory -i ./inventory.yml --host db1 | jq -r '.ansible_ssh_common_args'))
-	ssh -o StrictHostKeyChecking=no $(PROXY_CMD) -i $(DB1_KEY) $(DB1_USER)@$(DB1_HOST)
+	ssh $(PROXY_CMD) -i $(DB1_KEY) $(DB1_USER)@$(DB1_HOST)
 
 forget:
 	ssh-keygen -f '/home/theo/.ssh/known_hosts' -R '10.0.2.5'
